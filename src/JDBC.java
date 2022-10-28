@@ -10,6 +10,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -24,6 +25,8 @@ public class JDBC extends JFrame {
   private JButton btnConsultaPorCdigo;
   private JLabel lblIngreseCdigoDe;
   private JTextField tf3;
+  private JButton btnGuardar;
+  private JButton btnNewButton_1;
 
   
   /**
@@ -71,22 +74,29 @@ public class JDBC extends JFrame {
     contentPane.add(tf2);
     tf2.setColumns(10);
     
-    JButton btnGuardar = new JButton("Guardar");
+    btnGuardar = new JButton("Guardar");
     btnGuardar.addActionListener(new ActionListener() {
-      public void actionPerformed(ActionEvent arg0) {
-        labelResultado.setText("");        
-        try {
-          Connection conexion=DriverManager.getConnection("jdbc:mysql://localhost/agenda_carlos","root" ,"");
-          Statement comando=conexion.createStatement();
-          comando.executeUpdate("insert into ag_carlos(nota,fecha) values ('"+tf1.getText()+"',"+tf2.getText()+")");
-          conexion.close();
-          labelResultado.setText("se registraron los datos");
-          tf1.setText("");
-          tf2.setText("");
-        } catch(SQLException ex){
-          setTitle(ex.toString());
-        }
-      }
+    	public void actionPerformed(ActionEvent e) {
+            labelResultado.setText("");  
+            String fecha = tf1.getText();
+            String nota = tf2.getText();
+            System.out.println(fecha + " - " + nota);
+            try {
+              Connection conexion=DriverManager.getConnection("jdbc:mysql://localhost/agenda_carlos","root" ,"");
+              PreparedStatement comando=conexion.prepareStatement("INSERT INTO `ag_carlos` (`fecha`, `nota`, `codigo_nota`) VALUES (?,?, NULL)");
+              comando.setString(1, nota);
+              comando.setString(2, fecha);
+              comando.executeUpdate();
+              comando.close();
+              conexion.close();
+              labelResultado.setText("se registraron los datos");
+              tf1.setText("");
+              tf2.setText("");
+            } catch(SQLException ex){
+              setTitle(ex.toString());
+            }
+          
+    	}
     });
     btnGuardar.setBounds(433, 287, 89, 23);
     contentPane.add(btnGuardar);
@@ -154,26 +164,31 @@ public class JDBC extends JFrame {
     btnNewButton.setBounds(41, 287, 177, 23);
     contentPane.add(btnNewButton);
     
-    JButton btnNewButton_1 = new JButton("Modificar");
+    btnNewButton_1 = new JButton("Modificar");
     btnNewButton_1.addActionListener(new ActionListener() {
-      public void actionPerformed(ActionEvent e) {
-        labelResultado.setText("");
-        try {
-          Connection conexion=DriverManager.getConnection("jdbc:mysql://localhost/agenda_carlos","root" ,"");
-          Statement comando=conexion.createStatement();
-          int cantidad = comando.executeUpdate("update ag_carlos set nota='" + tf1.getText() + "'," +
-                                           "fecha=" + tf2.getText() + " where codigo_nota="+tf3.getText());
-          if (cantidad==1) {
-            labelResultado.setText("Se modifico la descripcion y el precio del artículo con dicho código");
-          } else {
-            labelResultado.setText("No existe un artículo con dicho código");
-          }
-          conexion.close();
-        } catch(SQLException ex){
-          setTitle(ex.toString());
-        }                
-      }
+    	public void actionPerformed(ActionEvent e) {
+            labelResultado.setText("");
+            String fecha = tf1.getText();
+            String nota = tf2.getText();
+            System.out.println(fecha + " - " + nota);
+            try {
+                Connection conexion=DriverManager.getConnection("jdbc:mysql://localhost/agenda_carlos","root" ,"");
+                PreparedStatement comando=conexion.prepareStatement("UPDATE `ag_carlos` SET `nota` = ? WHERE `ag_carlos`.`codigo_nota` = ?");
+                comando.setString(1, nota);
+                comando.setString(2, fecha);
+                comando.executeUpdate();
+                comando.close();
+                conexion.close();
+                System.out.println(fecha + " - " + nota);
+                labelResultado.setText("se modificaron los datos");
+                tf1.setText("");
+                tf2.setText("");
+              } catch(SQLException ex){
+                setTitle(ex.toString());
+              }      
+    	}
     });
+  
     btnNewButton_1.setBounds(244, 287, 179, 23);
     contentPane.add(btnNewButton_1);
     cargarDriver();
