@@ -170,19 +170,20 @@ public class JDBC extends JFrame {
             labelResultado.setText("");
             String fecha = tf1.getText();
             String nota = tf2.getText();
-            System.out.println(fecha + " - " + nota);
+            String codigo = tf3.getText();
             try {
                 Connection conexion=DriverManager.getConnection("jdbc:mysql://localhost/agenda_carlos","root" ,"");
-                PreparedStatement comando=conexion.prepareStatement("UPDATE `ag_carlos` SET `nota` = ? WHERE `ag_carlos`.`codigo_nota` = ?");
+                PreparedStatement comando=conexion.prepareStatement("UPDATE `ag_carlos` SET `fecha` = ?, `nota` = ? WHERE `ag_carlos`.`codigo_nota` = ?");
                 comando.setString(1, nota);
                 comando.setString(2, fecha);
+                comando.setString(3, codigo);
                 comando.executeUpdate();
                 comando.close();
                 conexion.close();
-                System.out.println(fecha + " - " + nota);
                 labelResultado.setText("se modificaron los datos");
                 tf1.setText("");
                 tf2.setText("");
+                tf3.setText("");
               } catch(SQLException ex){
                 setTitle(ex.toString());
               }      
